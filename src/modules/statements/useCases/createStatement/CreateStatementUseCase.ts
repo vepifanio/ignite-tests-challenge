@@ -26,7 +26,7 @@ export class CreateStatementUseCase {
       const { balance } = await this.statementsRepository.getUserBalance({ user_id });
 
       if (balance < amount) {
-        throw new CreateStatementError.InsufficientFunds()
+        throw new CreateStatementError.InsufficientFunds();
       }
     }
 
