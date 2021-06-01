@@ -11,8 +11,10 @@ let connection: Connection;
 describe("Create Statement Controller", () => {
   beforeAll(async () => {
     connection = await createConnection();
+  })
+  
+  beforeEach(async () => {
     await connection.runMigrations();
-
     const id = uuidV4();
     const password = await hash("1234", 8);
 
@@ -23,8 +25,11 @@ describe("Create Statement Controller", () => {
     );
   });
 
-  afterAll(async () => {
+  afterEach(async () => {
     await connection.dropDatabase();
+  });
+  
+  afterAll(async () => {
     await connection.close();
   });
 
@@ -40,7 +45,7 @@ describe("Create Statement Controller", () => {
     .post("/api/v1/statements/deposit")
     .set("Authorization", `Bearer ${token}`)
     .send({
-      amount: 100,
+      amount: 10,
       description: "Test deposit"
     });
 
@@ -60,7 +65,7 @@ describe("Create Statement Controller", () => {
     .post("/api/v1/statements/deposit")
     .set("Authorization", `Bearer ${token}`)
     .send({
-      amount: 100,
+      amount: 10,
       description: "Test deposit"
     });
 
@@ -68,7 +73,7 @@ describe("Create Statement Controller", () => {
     .post("/api/v1/statements/withdraw")
     .set("Authorization", `Bearer ${token}`)
     .send({
-      amount: 50,
+      amount: 5,
       description: "Test withdraw"
     });
 
@@ -88,7 +93,7 @@ describe("Create Statement Controller", () => {
     .post("/api/v1/statements/deposit")
     .set("Authorization", `Bearer ${token}`)
     .send({
-      amount: 50,
+      amount: 10.00,
       description: "Test deposit"
     });
 
@@ -96,10 +101,12 @@ describe("Create Statement Controller", () => {
     .post("/api/v1/statements/withdraw")
     .set("Authorization", `Bearer ${token}`)
     .send({
-      amount: 900,
+      amount: 20.00,
       description: "Test withdraw"
     });
 
-    console.log(response.body);
+    expect(response.statusCode).toEqual(400);
+    expect(response.body).toHaveProperty("message");
+    expect(response.body.message).toEqual("Insufficient funds");
   });
 });

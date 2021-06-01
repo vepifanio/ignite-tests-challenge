@@ -38,4 +38,26 @@ describe("Authenticate User Controller", () => {
 
     expect(response.body).toHaveProperty("token");
   });
+
+  it("Should not be able to authenticate a non existent user", async () => {
+    const response = await request(app)
+      .post("/api/v1/sessions")
+      .send({
+        email: "incorrect@mail.com",
+        password: "1234"
+      });
+    
+    expect(response.statusCode).toEqual(401);
+  });
+
+  it("Should not be able to authenticate a user with incorrect password", async () => {
+    const response = await request(app)
+      .post("/api/v1/sessions")
+      .send({
+        email: "vesp@mail.com",
+        password: "incorrect"
+      });
+    
+    expect(response.statusCode).toEqual(401);
+  });
 })
